@@ -1,70 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Eye Tracking and Scrolling</title>
-<style>
-  #videoElement {
-    width: 640px;
-    height: 480px;
-    background-color: #666;
-  }
-</style>
-<script src="https://cdn.jsdelivr.net/npm/tracking/build/tracking.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text-based Virtual Assistant</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    input[type="text"] {
+      width: calc(100% - 20px);
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .messages {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      min-height: 100px;
+      overflow-y: scroll;
+    }
+    .message {
+      margin-bottom: 10px;
+    }
+    .user-message {
+      background-color: #f0f0f0;
+      padding: 5px;
+      border-radius: 5px;
+    }
+    .assistant-message {
+      background-color: #007bff;
+      color: #fff;
+      padding: 5px;
+      border-radius: 5px;
+    }
+  </style>
 </head>
 <body>
-<video id="videoElement" autoplay></video>
-<script>
-  // Accessing the webcam
-  navigator.mediaDevices.getUserMedia({ video: true })
-    .then(function(stream) {
-      var video = document.querySelector("#videoElement");
-      video.srcObject = stream;
-      // After the video stream is loaded, start eye tracking
-      startEyeTracking();
-    })
-    .catch(function(err) {
-      console.log("An error occurred: " + err);
-    });
+  <div class="container">
+    <input type="text" id="userInput" placeholder="Type your message...">
+    <button onclick="sendMessage()">Send</button>
+    <div class="messages" id="messageArea"></div>
+  </div>
 
-  function startEyeTracking() {
-    var canvas = document.createElement('canvas');
-    var context = canvas.getContext('2d');
-    var video = document.getElementById('videoElement');
+  <script>
+    function sendMessage() {
+      var userInput = document.getElementById("userInput").value;
+      var messageArea = document.getElementById("messageArea");
+      
+      // Display user message
+      var userMessageElement = document.createElement("div");
+      userMessageElement.className = "message user-message";
+      userMessageElement.textContent = userInput;
+      messageArea.appendChild(userMessageElement);
 
-    // Set canvas dimensions to match video
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+      // Simulate assistant response (replace with actual logic)
+      var assistantResponse = "This is a response from the virtual assistant.";
+      
+      // Display assistant response
+      var assistantMessageElement = document.createElement("div");
+      assistantMessageElement.className = "message assistant-message";
+      assistantMessageElement.textContent = assistantResponse;
+      messageArea.appendChild(assistantMessageElement);
 
-    // Append the canvas to the body
-    document.body.appendChild(canvas);
-
-    // Create tracker
-    var tracker = new tracking.ObjectTracker('eye');
-
-    // Configure tracker
-    tracker.setInitialScale(4);
-    tracker.setStepSize(2);
-    tracker.setEdgesDensity(0.1);
-
-    // Add tracker to video
-    tracking.track('#videoElement', tracker, { camera: true });
-
-    // Listen for track event
-    tracker.on('track', function(event) {
-      context.clearRect(0, 0, canvas.width, canvas.height);
-
-      event.data.forEach(function(rect) {
-        context.strokeStyle = '#a64ceb';
-        context.strokeRect(rect.x, rect.y, rect.width, rect.height);
-        context.font = '11px Helvetica';
-        context.fillStyle = "#fff";
-        context.fillText('x: ' + rect.x + 'px', rect.x + rect.width + 5, rect.y + 11);
-        context.fillText('y: ' + rect.y + 'px', rect.x + rect.width + 5, rect.y + 22);
-      });
-    });
-  }
-</script>
+      // Scroll to bottom
+      messageArea.scrollTop = messageArea.scrollHeight;
+      
+      // Clear input field
+      document.getElementById("userInput").value = "";
+    }
+  </script>
 </body>
 </html>
