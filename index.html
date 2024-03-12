@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eye Tracking and Scrolling</title>
+<style>
+  #videoElement {
+    width: 640px;
+    height: 480px;
+    background-color: #666;
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/tracking/build/tracking.js"></script>
+</head>
+<body>
+<video id="videoElement" autoplay></video>
+<script>
+  // Accessing the webcam
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(function(stream) {
+      var video = document.querySelector("#videoElement");
+      video.srcObject = stream;
+      // After the video stream is loaded, start eye tracking
+      startEyeTracking();
+    })
+    .catch(function(err) {
+      console.log("An error occurred: " + err);
+    });
+
+  function startEyeTracking() {
+    var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
+    var video = document.getElementById('videoElement');
+
+    // Set canvas dimensions to match video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // Append the canvas to the body
+    document.body.appendChild(canvas);
+
+    // Create tracker
+    var tracker = new tracking.ObjectTracker('eye');
+
+    // Configure tracker
+    tracker.setInitialScale(4);
+    tracker.setStepSize(2);
+    tracker.setEdgesDensity(0.1);
+
+    // Add tracker to video
+    tracking.track('#videoElement', tracker, { camera: true });
+
+    // Listen for track event
+    tracker.on('track', function(event) {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+
+      event.data.forEach(function(rect) {
+        context.strokeStyle = '#a64ceb';
+        context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+        context.font = '11px Helvetica';
+        context.fillStyle = "#fff";
+        context.fillText('x: ' + rect.x + 'px', rect.x + rect.width + 5, rect.y + 11);
+        context.fillText('y: ' + rect.y + 'px', rect.x + rect.width + 5, rect.y + 22);
+      });
+    });
+  }
+</script>
+</body>
+</html>
